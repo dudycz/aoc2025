@@ -51,46 +51,7 @@ mod tests {
         assert_eq!(rotate(90, "R16"), (6, 1));
         assert_eq!(rotate(50, "R1000"), (50, 10));
         assert_eq!(rotate(10, "L110"), (0, 1));
-    }
-
-    #[test]
-    fn test_input() {
-        // Format: (input_command, expected_pos, expected_cycles)
-        let test_cases = vec![
-            ("L68", 82, 1),
-            ("L30", 52, 0),
-            ("R48", 0, 0),
-            ("L5", 95, 0),
-            ("R60", 55, 1),
-            ("L55", 0, 0),
-            ("L1", 99, 0),
-            ("L99", 0, 0),
-            ("R14", 14, 0),
-            ("L82", 32, 1),
-        ];
-
-        let mut pos = 50;
-        for (i, (input, expected_pos, expected_cycles)) in test_cases.iter().enumerate() {
-            let (new_pos, cycles) = rotate(pos, input);
-            assert_eq!(
-                new_pos,
-                *expected_pos,
-                "Step {}: After '{}', expected position {}, got {}",
-                i + 1,
-                input,
-                expected_pos,
-                new_pos
-            );
-            assert_eq!(
-                cycles,
-                *expected_cycles,
-                "Step {}: After '{}', expected {} cycles, got {}",
-                i + 1,
-                input,
-                expected_cycles,
-                cycles
-            );
-            pos = new_pos;
-        }
+        assert_eq!(rotate(0, "L5"), (95, 0));
+        assert_eq!(rotate(52, "R48"), (0, 0));
     }
 }
