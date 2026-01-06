@@ -1,27 +1,96 @@
-// load file.txt line by line
-// start from 50
-// for each line check if is multiplicity of 100
-// handle rotations
 use std::fs::read_to_string;
 
+fn rotate(current_pos: i32, input: &str) -> (i32, i32) {
+    let dir = input.chars().next().unwrap();
+    let value = input[1..].parse::<i32>().unwrap_or(0);
+
+    let total_offset = match dir {
+        'R' => current_pos + value,
+        'L' => current_pos - value,
+        _ => current_pos,
+    };
+
+    let cycles = if total_offset > current_pos {
+        (total_offset - 1).div_euclid(100) - current_pos.div_euclid(100)
+    } else if total_offset < current_pos {
+        (current_pos - 1).div_euclid(100) - total_offset.div_euclid(100)
+    } else {
+        0
+    };
+
+    let pos = total_offset.rem_euclid(100);
+
+    (pos, cycles)
+}
 
 fn main() {
-    let mut input = Vec::new();
-    // lock - init(50)
-    // lock.rotate
-    // lock.get_count
-
+    let mut pos = 50;
+    let mut zero_cnt = 0;
+    let mut cycle_cnt = 0;
     for line in read_to_string("input.txt").unwrap().lines() {
-        
+        let (new_pos, cycles) = rotate(pos, line);
+        cycle_cnt += cycles;
+        if new_pos == 0 {
+            zero_cnt += 1;
+        }
+        pos = new_pos
     }
+    dbg!(zero_cnt);
+    dbg!(cycle_cnt + zero_cnt);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    [test]
+    #[test]
     fn test_algo() {
-        //srvlet input
+        assert_eq!(rotate(20, "L16"), (4, 0));
+        assert_eq!(rotate(20, "R16"), (36, 0));
+        assert_eq!(rotate(10, "L16"), (94, 1));
+        assert_eq!(rotate(90, "R16"), (6, 1));
+        assert_eq!(rotate(50, "R1000"), (50, 10));
+        assert_eq!(rotate(10, "L110"), (0, 1));
+    }
+
+    #[test]
+    fn test_input() {
+        // Format: (input_command, expected_pos, expected_cycles)
+        let test_cases = vec![
+            ("L68", 82, 1),
+            ("L30", 52, 0),
+            ("R48", 0, 0),
+            ("L5", 95, 0),
+            ("R60", 55, 1),
+            ("L55", 0, 0),
+            ("L1", 99, 0),
+            ("L99", 0, 0),
+            ("R14", 14, 0),
+            ("L82", 32, 1),
+        ];
+
+        let mut pos = 50;
+        for (i, (input, expected_pos, expected_cycles)) in test_cases.iter().enumerate() {
+            let (new_pos, cycles) = rotate(pos, input);
+            assert_eq!(
+                new_pos,
+                *expected_pos,
+                "Step {}: After '{}', expected position {}, got {}",
+                i + 1,
+                input,
+                expected_pos,
+                new_pos
+            );
+            assert_eq!(
+                cycles,
+                *expected_cycles,
+                "Step {}: After '{}', expected {} cycles, got {}",
+                i + 1,
+                input,
+                expected_cycles,
+                cycles
+            );
+            pos = new_pos;
+        }
     }
 }
